@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inicio - Red Social{% endblock %}
+
+{% block body %}
+<div class="container" style="max-width: 800px; margin: 50px auto; font-family: sans-serif;">
+    
+    <div style="background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center;">
+        
+        <h1 style="color: #333;">¡Hola, {{ app.user.nombre }}! 👋</h1>
+        
+        <p style="font-size: 1.2em; color: #666;">
+            Bienvenido a tu muro personal.
+        </p>
+        
+        <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+            <p>Has iniciado sesión con: <strong>{{ app.user.email }}</strong></p>
+            <p>Tu rol es: 
+                {% for role in app.user.roles %}
+                    <span style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em;">{{ role }}</span>
+                {% endfor %}
+            </p>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <a href="{{ path('app_logout') }}" style="background: #dc3545; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; font-weight: bold;">
+                Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

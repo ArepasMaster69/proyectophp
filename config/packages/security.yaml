@@ -1,17 +1,16 @@
 security:
-    # 1. ENCRIPTACIÓN: Cómo se guardan las contraseñas
+    #  Cómo se guardan las contraseñas
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-    # 2. PROVEEDOR: Dónde están los usuarios (Base de Datos)
+    #   Dónde están los usuarios (Base de Datos)
     providers:
-        # Le decimos que busque en la entidad User usando el campo 'email'
         app_user_provider:
             entity:
                 class: App\Entity\User
                 property: email
 
-    # 3. CORTAFUEGOS: Las reglas del portero
+    #  CORTAFUEGOS: 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -21,19 +20,19 @@ security:
             lazy: true
             provider: app_user_provider
 
-            # AQUI ESTA LA CLAVE: Login con formulario
+             Login con formulario
             form_login:
-                login_path: app_login  # Ruta para mostrar el formulario
-                check_path: app_login  # Ruta para comprobar los datos
-                enable_csrf: true      # Protección anti-hackers activada
-                default_target_path: app_home # ¡IMPORTANTE! Si entra bien, ir al HOME
+                login_path: app_login 
+                check_path: app_login 
+                enable_csrf: true      
+                default_target_path: app_home 
 
-            # Configuración para salir (Logout)
+            #  Logout
             logout:
                 path: app_logout
                 target: app_login
 
-    # 4. CONTROL DE ACCESO: ¿Quién puede ver qué?
+    #  CONTROL DE ACCESO
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
