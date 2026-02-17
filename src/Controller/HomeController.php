@@ -8,10 +8,18 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
 {
+    #[Route('/', name: 'app_root')]
+    public function root(): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_home');
+        }
+        return $this->redirectToRoute('app_login');
+    }
+
     #[Route('/home', name: 'app_home')]
     public function index(): Response
     {
-        // Renderizamos la vista 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',
         ]);
