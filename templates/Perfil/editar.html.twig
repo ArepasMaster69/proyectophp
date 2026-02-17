@@ -1,0 +1,56 @@
+{# templates/perfil/editar.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Perfil{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="perfil-header">
+        <div class="foto-perfil">
+            {% set avatar = user.fotoPerfil ? asset(user.fotoPerfil) : asset('IMAGES/defaultPerfil.png') %}
+            <img src="{{ avatar }}" alt="Foto de perfil">
+            
+            <form method="POST" enctype="multipart/form-data" class="foto-form">
+                <input type="file" name="fotoperfil" id="fotoperfil" accept="image/*">
+                <label for="fotoperfil" class="btn-cambiar-foto">Seleccionar imagen</label>
+                <button type="submit" name="cambiarfoto" class="btn-cambiar-foto">Guardar nueva foto</button>
+                <button type="submit" name="eliminarfoto" class="btn-eliminar-foto">Eliminar foto</button>
+            </form>
+        </div>
+
+        <div class="info-perfil">
+            <h1>Editar perfil</h1>
+
+            <form method="POST" class="form-editar-perfil">
+                <div class="form-group">
+                    <label for="nick">Nombre de usuario</label>
+                    <input type="text" id="nick" name="nick" value="{{ user.nombre }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="biografia">Biografía</label>
+                    <textarea id="biografia" name="biografia" rows="4" placeholder="Cuéntanos algo sobre ti">{{ user.biografia ?? '' }}</textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fechanacimiento">Fecha de nacimiento</label>
+                        <input type="date" id="fechanacimiento" name="fechanacimiento" 
+                               value="{{ user.fechaNacimiento ? user.fechaNacimiento.format('Y-m-d') : '' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ciudad">Ciudad</label>
+                        <input type="text" id="ciudad" name="ciudad" value="{{ user.ciudad ?? '' }}" 
+                               placeholder="Ej: Madrid">
+                    </div>
+                </div>
+
+                <button type="submit" name="guardarperfil" class="btn-guardar-perfil">
+                    Guardar cambios
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

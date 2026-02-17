@@ -16,7 +16,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 {
     public function __construct(ManagerRegistry $registry)
     {
-        // Aquí le decimos que este repositorio trabaja con la Entidad "User"
         parent::__construct($registry, User::class);
     }
 
@@ -33,5 +32,56 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setPassword($newHashedPassword);
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
+    }
+
+    // ===== MÉTODOS PARA HOME.PHP =====
+    public function findAllOrderedByName(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->orderBy('u.nombre', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // ===== MÉTODOS PARA USUARIOS.PHP =====
+    public function searchByName(string $termino): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.nombre LIKE :termino')
+            ->setParameter('termino', $termino . '%')
+            ->orderBy('u.nombre', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // ===== MÉTODOS PARA EDITAR PERFIL =====
+    public function updateFotoPerfil(int $userId, ?string $rutaImagen): void
+    {
+        $entityManager = $this->getEntityManager();
+        $user = $this->find($userId);
+        
+        if (!$user) {
+            throw $this->createNotFoundException('Usuario no encontrado');
+        }
+        
+        $user->setFotoPerfil($rutaImagen);
+        $entityManager->flush();
+    }
+
+    public function updatePerfil(int $userId, string $nombre, ?string $biografia, ?\DateTimeInterface $fechaNacimiento, ?string $ciudad): void
+    {
+        $entityManager = $this->getEntityManager();
+        $user = $this->find($userId);
+        
+        if (!$user) {
+            throw $this->createNotFoundException('Usuario no encontrado');
+        }
+        
+        $user->setNombre($nombre);
+        $user->setBiografia($biografia);
+        $user->setFechaNacimiento($fechaNacimiento);
+        $user->setCiudad($ciudad);
+        
+        $entityManager->flush();
     }
 }
