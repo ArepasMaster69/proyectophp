@@ -1,63 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Iniciar Sesión{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
-{% endblock %}
+{% block title %}Iniciar Sesión - Red Social{% endblock %}
 
 {% block body %}
-    <div class="contenedor-principal">
+<div style="max-width: 400px; margin: 50px auto; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background: white;">
+    <h2 style="text-align: center; color: #333;">Iniciar Sesión</h2>
+    
+    {# Aquí mostramos el cartel rojo si hay error (Credenciales inválidas) #}
+    {% if error %}
+        <div style="background: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: center;">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
 
-
-    <div class="caja-login">
-    <form method="post">
-        
-        {# 1. CONTROL DE ERRORES #}
-        {# Si Symfony detecta que la contraseña está mal, activa esto automáticamente #}
-        {% if error %}
-            <div class="mensaje-error">
-                {{ error.messageKey|trans(error.messageData, 'security') }}
-            </div>
-        {% endif %}
-
-        <h1>Iniciar Sesión</h1>
-
-        {# 2. CAMPO USUARIO #}
-        <div class="campo">
-            <label for="username">Usuario</label>
-            <input type="text" 
-                   value="{{ last_username }}" 
-                   name="_username" 
-                   id="username" 
-                   class="input-login" 
-                   required autofocus>
+    <form method="post" style="margin-top: 20px;">
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; color: #666;">Usuario:</label>
+            {# OJO: Hemos cambiado type="email" por type="text" #}
+            <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="username" required autofocus style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
         </div>
 
-        {# 3. CAMPO CONTRASEÑA #}
-        <div class="campo">
-            <label for="password">Contraseña</label>
-            <input type="password" 
-                   name="_password" 
-                   id="password" 
-                   class="input-login" 
-                   required>
+        <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 5px; color: #666;">Contraseña:</label>
+            {# OJO AQUÍ: name="_password" #}
+            <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
         </div>
 
-        {# 4. TOKEN DE SEGURIDAD (Invisible pero obligatorio) #}
-        {# Esto evita que hackers manden formularios desde otras webs #}
+        {# Este campo oculto es obligatorio en Symfony por seguridad (CSRF) #}
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        {# 5. BOTÓN #}
-        <button type="submit" class="boton-entrar">
+        <button type="submit" style="width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
             Entrar
         </button>
-
-        <div class="enlaces">
-    <a href="{{ path('app_register') }}">Regístrate</a>
-</div>
     </form>
+    
+    <p style="margin-top: 20px; text-align: center;">
+        ¿No tienes una cuenta? <a href="{{ path('app_register') }}" style="color: #28a745; text-decoration: none;">Regístrate aquí</a>
+    </p>
 </div>
-        </div>
 {% endblock %}

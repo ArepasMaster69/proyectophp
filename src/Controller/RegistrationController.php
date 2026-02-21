@@ -15,7 +15,12 @@ class RegistrationController extends AbstractController
     #[Route('/registro', name: 'app_register')]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
-        // Si ya nos envían datos (POST)
+        // Si el usuario ya está logueado, no tiene sentido que se registre
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        // Si nos envían el formulario (POST)
         if ($request->isMethod('POST')) {
             $user = new User();
             
@@ -23,14 +28,12 @@ class RegistrationController extends AbstractController
             $email = $request->request->get('email');
             $password = $request->request->get('password');
             $nombre = $request->request->get('nombre');
-            $username = $request->request->get('username');
 
-            // Rellenamos el usuario
+            // Rellenamos el usuario (sin el username)
             $user->setEmail($email);
             $user->setNombre($nombre);
-            $user->setUsername($username);
             
-            // ¡ENCRIPTAMOS LA CONTRASEÑA! (La magia)
+            // ¡ENCRIPTAMOS LA CONTRASEÑA!
             $user->setPassword(
                 $userPasswordHasher->hashPassword(
                     $user,
@@ -38,11 +41,11 @@ class RegistrationController extends AbstractController
                 )
             );
 
-            // Guardamos en BD
+            // Guardamos en la Base de Datos
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Redirigir al login
+            // Redirigir al login para que entre con su nueva cuenta
             return $this->redirectToRoute('app_login');
         }
 

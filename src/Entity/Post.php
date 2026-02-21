@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
+#[ORM\Table(name: 'posts')]
 class Post
 {
     #[ORM\Id]
@@ -19,25 +20,22 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     private ?string $contenido = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(name: 'fecha_publicacion', type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $fecha = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $foto = null;
+    // ❌ Hemos eliminado la propiedad "foto" para que no dé error con tu base de datos
 
-    // Relación: Muchos Posts pertenecen a un Usuario
     #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'usuario_id', nullable: false)]
     private ?User $usuario = null;
 
-    // Relación: Un Post tiene muchos Comentarios
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: Comentario::class, orphanRemoval: true)]
     private Collection $comentarios;
 
     public function __construct()
     {
         $this->comentarios = new ArrayCollection();
-        $this->fecha = new \DateTime(); // Se pone la fecha actual automáticamente al crear
+        $this->fecha = new \DateTime(); 
     }
 
     public function getId(): ?int { return $this->id; }
@@ -47,9 +45,6 @@ class Post
 
     public function getFecha(): ?\DateTimeInterface { return $this->fecha; }
     public function setFecha(\DateTimeInterface $fecha): static { $this->fecha = $fecha; return $this; }
-
-    public function getFoto(): ?string { return $this->foto; }
-    public function setFoto(?string $foto): static { $this->foto = $foto; return $this; }
 
     public function getUsuario(): ?User { return $this->usuario; }
     public function setUsuario(?User $usuario): static { $this->usuario = $usuario; return $this; }

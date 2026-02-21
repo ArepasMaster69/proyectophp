@@ -9,8 +9,7 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email
-
+                # ¡Hemos borrado 'property: email' para que use nuestra nueva función!
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
