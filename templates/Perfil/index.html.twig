@@ -1,0 +1,109 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mi Perfil - {{ usuario.nombre }}{% endblock %}
+
+{% block body %}
+<div style="max-width: 650px; margin: 30px auto; font-family: 'Segoe UI', Arial, sans-serif;">
+
+    <div style="margin-bottom: 20px;">
+        <a href="{{ path('app_home') }}" style="text-decoration: none; color: #007bff; font-weight: bold;">
+            JustVibe
+        </a>
+    </div>
+
+    <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; border: 1px solid #eaeaea; text-align: center;">
+        
+        <div style="width: 120px; height: 120px; background: #f0f2f5; border-radius: 50%; margin: 0 auto 15px auto; overflow: hidden; border: 4px solid #007bff; display: flex; align-items: center; justify-content: center; font-size: 2.5em; color: #007bff; font-weight: bold;">
+            {% if usuario.fotoPerfil %}
+                <img src="{{ usuario.fotoPerfil }}" alt="Avatar de {{ usuario.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
+            {% else %}
+                {{ usuario.nombre|default('?')|first|upper }}
+            {% endif %}
+        </div>
+
+        <h2 style="margin: 0; color: #333;">{{ usuario.nombre }}</h2>
+        <p style="color: #666; margin: 5px 0 15px 0;">{{ usuario.email }}</p>
+
+        {% if usuario.biografia %}
+            <p style="color: #444; font-style: italic; margin-bottom: 10px;">"{{ usuario.biografia }}"</p>
+        {% endif %}
+        
+        {% if usuario.ciudad %}
+            <p style="color: #888; font-size: 0.9em; margin-bottom: 15px;">📍 {{ usuario.ciudad }}</p>
+        {% endif %}
+
+        <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 20px;">
+            <div style="text-align: center;">
+                <strong style="display: block; font-size: 1.2em; color: #333;">{{ posts|length }}</strong>
+                <span style="color: #888; font-size: 0.9em;">Publicaciones</span>
+            </div>
+            <div style="text-align: center;">
+                <strong style="display: block; font-size: 1.2em; color: #333;">{{ usuario.seguidores|length }}</strong>
+                <span style="color: #888; font-size: 0.9em;">Seguidores</span>
+            </div>
+            <div style="text-align: center;">
+                <strong style="display: block; font-size: 1.2em; color: #333;">{{ usuario.seguidos|length }}</strong>
+                <span style="color: #888; font-size: 0.9em;">Seguidos</span>
+            </div>
+        </div>
+
+        {% if app.user and app.user.id == usuario.id %}
+        <a href="{{ path('app_perfil_editar') }}" style="display: inline-block; padding: 10px 25px; background: #e4e6eb; color: #050505; text-decoration: none; border-radius: 6px; font-weight: bold; transition: 0.2s;">
+             Editar perfil
+        </a>
+        {% endif %}
+    </div>
+
+    <h3 style="color: #333; margin-bottom: 20px; border-bottom: 2px solid #eaeaea; padding-bottom: 10px;">Mis Publicaciones</h3>
+
+    {% for post in posts %}
+        <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #eaeaea;">
+            
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 50px; height: 50px; background: #f0f2f5; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white; font-size: 1.2em; margin-right: 15px; overflow: hidden; border: 2px solid #007bff;">
+                        {% if post.usuario.fotoPerfil %}
+                            <img src="{{ post.usuario.fotoPerfil }}" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <span style="color: #007bff;">{{ post.usuario.nombre|default('?')|first|upper }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #222; font-size: 1.1em;">{{ post.usuario.nombre }}</h4>
+                        <small style="color: #888;">{{ post.fecha|date('d/m/Y H:i') }}</small>
+                    </div>
+                </div>
+
+                {% if is_granted('ROLE_ADMIN') %}
+                <form method="POST" action="{{ path('eliminar_post', {id: post.id}) }}" onsubmit="return confirm('¿Seguro que quieres eliminar este post?');">
+                    <button type="submit" style="background: none; border: none; color: red; font-size: 1.2em; cursor: pointer;" title="Eliminar Post">🗑️</button>
+                </form>
+                {% endif %}
+            </div>
+
+            <p style="color: #444; line-height: 1.5; font-size: 1.05em; margin-bottom: 15px;">
+                {{ post.contenido }}
+            </p>
+            
+            {% if post.imagen %}
+                <div style="margin-bottom: 15px; border-radius: 8px; overflow: hidden; border: 1px solid #eee;">
+                    <img src="{{ asset('uploads/' ~ post.imagen) }}" alt="Imagen" style="width: 100%; display: block;">
+                </div>
+            {% endif %}
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+            
+            <div style="display: flex; gap: 20px;">
+                <button style="background: none; border: none; color: #666; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px;">❤️ Me gusta</button>
+                <a href="{{ path('post_show', {id: post.id}) }}" style="color: #888; text-decoration: none; font-weight: bold;">💬 Comentarios ({{ post.comentarios|length }})</a>
+            </div>
+        </div>
+    {% else %}
+        <div style="text-align: center; color: #888; padding: 50px; background: white; border-radius: 12px; border: 1px dashed #ccc;">
+            <p style="font-size: 1.2em; margin-bottom: 10px;">📭</p>
+            <p>0 publicaciones.</p>
+        </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

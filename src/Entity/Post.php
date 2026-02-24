@@ -20,16 +20,30 @@ class Post
     #[ORM\Column(type: Types::TEXT)]
     private ?string $contenido = null;
 
+    // Mantenemos nuestra variable $fecha para que no explote el Muro
     #[ORM\Column(name: 'fecha_publicacion', type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $fecha = null;
 
-    // ❌ Hemos eliminado la propiedad "foto" para que no dé error con tu base de datos
+    // === NUEVOS CAMPOS DE TU COMPAÑERO ===
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $imagen = null;
+
+    #[ORM\Column(name: 'archivo_adjunto', length: 255, nullable: true)]
+    private ?string $archivoAdjunto = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $visible = true;
+
+    #[ORM\Column(type: 'boolean')]
+    private ?bool $editado = false;
+    // =====================================
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(name: 'usuario_id', nullable: false)]
     private ?User $usuario = null;
 
-    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Comentario::class, orphanRemoval: true)]
+    // Cambiado para conectar con su entidad Comment
+    #[ORM\OneToMany(mappedBy: 'post', targetEntity: Comment::class, orphanRemoval: true)]
     private Collection $comentarios;
 
     public function __construct()
@@ -38,6 +52,7 @@ class Post
         $this->fecha = new \DateTime(); 
     }
 
+    // --- GETTERS Y SETTERS ---
     public function getId(): ?int { return $this->id; }
 
     public function getContenido(): ?string { return $this->contenido; }
@@ -45,6 +60,19 @@ class Post
 
     public function getFecha(): ?\DateTimeInterface { return $this->fecha; }
     public function setFecha(\DateTimeInterface $fecha): static { $this->fecha = $fecha; return $this; }
+
+    // Setters de tu compañero
+    public function getImagen(): ?string { return $this->imagen; }
+    public function setImagen(?string $imagen): static { $this->imagen = $imagen; return $this; }
+
+    public function getArchivoAdjunto(): ?string { return $this->archivoAdjunto; }
+    public function setArchivoAdjunto(?string $archivo): static { $this->archivoAdjunto = $archivo; return $this; }
+
+    public function isVisible(): ?bool { return $this->visible; }
+    public function setVisible(bool $visible): static { $this->visible = $visible; return $this; }
+
+    public function isEditado(): ?bool { return $this->editado; }
+    public function setEditado(bool $editado): static { $this->editado = $editado; return $this; }
 
     public function getUsuario(): ?User { return $this->usuario; }
     public function setUsuario(?User $usuario): static { $this->usuario = $usuario; return $this; }
