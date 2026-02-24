@@ -1,53 +1,41 @@
 <?php
-// src/Controller/PerfilController.php
 namespace App\Controller;
 
+use App\Entity\Post;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
 class PerfilController extends AbstractController
 {
-    #[Route('/perfil/editar', name: 'app_perfil_editar', methods: ['GET', 'POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function editar(
-        Request $request, 
-        UserRepository $userRepository,
-        UserPasswordHasherInterface $passwordHasher
-    ): Response 
+    // === 1. LA VISTA DE TU PERFIL (La que hicimos nosotros) ===
+    #[Route('/perfil', name: 'app_perfil')]
+    public function index(EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
+        if (!$user) return $this->redirectToRoute('app_login');
+
+        $posts = $entityManager->getRepository(Post::class)->findBy(['usuario' => $user], ['fecha' => 'DESC']);
+
+        return $this->render('perfil/index.html.twig', [
+            'usuario' => $user,
+            'posts'   => $posts,
+        ]);
+    }
+
+    // === 2. LA VISTA DE EDITAR (La de tu compañero) ===
+    #[Route('/perfil/editar', name: 'app_perfil_editar', methods: ['GET', 'POST'])]
+    public function editar(Request $request, UserRepository $userRepository): Response 
+    {
+        $user = $this->getUser();
+        if (!$user) return $this->redirectToRoute('app_login');
         
-        // Cambiar foto
-        if ($request->isMethod('POST') && $request->request->has('cambiarfoto')) {
-            /** @var UploadedFile|null $fotoFile */
-            $fotoFile = $request->files->get('fotoperfil');
-            
-            if ($fotoFile && $fotoFile->isValid()) {
-                $nombreArchivo = $user->getUserIdentifier() . '.jpg';
-                $rutaCompleta = $this->getParameter('kernel.project_dir') . '/public/IMAGES/' . $nombreArchivo;
-                
-                try {
-                    $fotoFile->move(dirname($rutaCompleta), basename($rutaCompleta));
-                    $userRepository->updateFotoPerfil($user->getId(), '/IMAGES/' . $nombreArchivo);
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Error al subir la imagen');
-                }
-            }
-        }
-        
-        // Eliminar foto
-        if ($request->isMethod('POST') && $request->request->has('eliminarfoto')) {
-            $userRepository->updateFotoPerfil($user->getId(), null);
-        }
-        
-        // Actualizar datos perfil
+        // Guardar cambios del perfil
         if ($request->isMethod('POST') && $request->request->has('guardarperfil')) {
             $nuevoNombre = trim($request->request->get('nick', ''));
             $biografia = trim($request->request->get('biografia', ''));
@@ -57,7 +45,7 @@ class PerfilController extends AbstractController
             $userRepository->updatePerfil($user->getId(), $nuevoNombre, $biografia, $fechaNac, $ciudad);
             
             $this->addFlash('success', 'Perfil actualizado correctamente');
-            return $this->redirectToRoute('app_perfil_editar');
+            return $this->redirectToRoute('app_perfil');
         }
         
         return $this->render('perfil/editar.html.twig', [

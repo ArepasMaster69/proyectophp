@@ -20,10 +20,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
-    /**
-     * ¡ESTA ES LA MAGIA! 
-     * Esta función busca al usuario por email O por nombre cuando intenta hacer login.
-     */
+   
+    //  Esta función busca al usuario por email O por nombre cuando intenta hacer login.
+     
     public function loadUserByIdentifier(string $identifier): ?User
     {
         return $this->getEntityManager()->createQuery(

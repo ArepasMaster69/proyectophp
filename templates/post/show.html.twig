@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Post de {{ post.usuario.nombre }}{% endblock %}
+
+{% block body %}
+<div style="max-width: 650px; margin: 30px auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    
+    <a href="{{ path('app_home') }}" style="text-decoration: none; color: #007bff; font-weight: bold; margin-bottom: 15px; display: inline-block;">JustVibe</a>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>{{ post.usuario.nombre }}</h2>
+        
+        {% if is_granted('ROLE_ADMIN') %}
+        <form method="POST" action="{{ path('eliminar_post', {id: post.id}) }}" onsubmit="return confirm('¿Seguro que quieres eliminar este post? Serás redirigido al muro.');">
+            <button type="submit" style="background: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-weight: bold;"> Borrar Post</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <p style="font-size: 1.1em; line-height: 1.5;">{{ post.contenido }}</p>
+    <small style="color: #888;">{{ post.fecha|date('d/m/Y H:i') }}</small>
+
+    {% if post.imagen %}
+        <div style="margin-top: 15px;">
+            <img src="{{ asset('uploads/' ~ post.imagen) }}" style="max-width: 100%; border-radius: 8px;">
+        </div>
+    {% endif %}
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <h4>Comentarios ({{ post.comentarios|length }})</h4>
+
+    {% for comentario in post.comentarios %}
+        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between;">
+            <div>
+                <strong style="color: #007bff;">{{ comentario.usuario.nombre }}</strong>
+                <p style="margin: 5px 0;">{{ comentario.contenido }}</p>
+                <small style="color: #888;">{{ comentario.fecha|date('d/m/Y H:i') }}</small>
+            </div>
+            
+            {% if is_granted('ROLE_ADMIN') %}
+            <form method="POST" action="{{ path('eliminar_comentario', {id: comentario.id}) }}" onsubmit="return confirm('¿Borrar comentario?');">
+                <button type="submit" style="background: none; border: none; color: red; cursor: pointer;" title="Eliminar Comentario">🗑️</button>
+            </form>
+            {% endif %}
+        </div>
+    {% else %}
+        <p style="color: #666;">No hay comentarios todavía.</p>
+    {% endfor %}
+
+    {% if app.user %}
+    <form method="POST" action="{{ path('crear_comentario', {id: post.id}) }}" style="margin-top: 20px;">
+        <textarea name="contenido"  style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; margin-bottom: 10px; outline: none;"></textarea>
+        <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; cursor: pointer;">Comentar</button>
+    </form>
+    {% endif %}
+
+</div>
+{% endblock %}

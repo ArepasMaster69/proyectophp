@@ -32,6 +32,15 @@ class RegistrationController extends AbstractController
             // Rellenamos el usuario (sin el username)
             $user->setEmail($email);
             $user->setNombre($nombre);
+
+
+
+$pokemonId = random_int(1, 1025);            // Creamos el enlace exacto a su foto en la PokeAPI
+            $fotoPokemon = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/{$pokemonId}.png";
+            // Se la asignamos al usuario
+            $user->setFotoPerfil($fotoPokemon);
+
+
             
             // ¡ENCRIPTAMOS LA CONTRASEÑA!
             $user->setPassword(
